@@ -83,6 +83,7 @@ public class helper_pdf {
         }
     }
 
+
     public static void toolbar (final Activity activity) {
 
         String title;
