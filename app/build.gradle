@@ -2,12 +2,12 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion "25.0.0"
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         applicationId "de.baumann.pdfcreator"
         vectorDrawables.useSupportLibrary = true
-        minSdkVersion 17
+        minSdkVersion 15
         targetSdkVersion 25
         versionCode 11
         versionName "2.4"
@@ -18,14 +18,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+	lintOptions {
+        abortOnError false
+    }
     return void
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:25.1.0'
-    compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:appcompat-v7:25.0.0'
+    compile 'com.android.support:design:25.0.0'
     compile 'com.itextpdf:itextpdf:5.5.10'
     compile 'jp.co.cyberagent.android.gpuimage:gpuimage-library:1.4.1'
     compile 'com.joanzapata.pdfview:android-pdfview:1.0.4@aar'
