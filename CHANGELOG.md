@@ -1,3 +1,6 @@
+### v 2.5 (WIP)
+- improved MuPDF integration
+
 ### v 2.4
 - added: PDF viewer support (muPDF)
 
