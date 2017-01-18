@@ -564,6 +564,22 @@ public class create_image extends Fragment {
     }
 
     @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && isResumed()) {
+            File imgFile = new File(Environment.getExternalStorageDirectory() + "/Pictures/.pdf_temp/pdf_temp.jpg");
+            helper_pdf.pdf_textField(getActivity(), rootView);
+            helper_pdf.toolbar(getActivity());
+            if(imgFile.exists()){
+                Bitmap myBitmap = BitmapFactory.decodeFile(imgFile.getAbsolutePath());
+                img.setImageBitmap(myBitmap);
+            } else {
+                img.setImageResource(R.drawable.image);
+            }
+        }
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         String path = helper_pdf.actualPath(getActivity());

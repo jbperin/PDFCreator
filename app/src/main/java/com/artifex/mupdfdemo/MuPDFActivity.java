@@ -1,6 +1,7 @@
 package com.artifex.mupdfdemo;
 
 import android.app.AlertDialog;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
@@ -13,10 +14,14 @@ import android.graphics.Rect;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RectShape;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
+import android.provider.OpenableColumns;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -367,7 +372,17 @@ public class MuPDFActivity extends AppCompatActivity implements FilePicker.FileP
 					}
 				}
 				if (buffer != null) {
-					sharedPref.edit().putString("menu", "no").apply();
+					String path = getFilePath(MuPDFActivity.this, uri);
+					String name = getFileName(uri);
+
+					if (path != null) {
+						sharedPref.edit().putString("pathPDF", path).apply();
+						sharedPref.edit().putString("title", name).apply();
+					} else {
+
+						sharedPref.edit().putString("menu", "no").apply();
+					}
+
 					core = openBuffer(buffer, intent.getType());
 				} else {
 					String pathToEdit = uri.getPath();
@@ -416,6 +431,71 @@ public class MuPDFActivity extends AppCompatActivity implements FilePicker.FileP
 
 		createUI(savedInstanceState);
 
+	}
+
+	private String getFileName(Uri uri) {
+		String result = null;
+		if (uri.getScheme().equals("content")) {
+			Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+			try {
+				if (cursor != null && cursor.moveToFirst()) {
+					result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+				}
+			} finally {
+				if (cursor != null) {
+					cursor.close();
+				}
+			}
+		}
+		if (result == null) {
+			result = uri.getLastPathSegment();
+		}
+		return result;
+	}
+
+	private static String getFilePath(Context context, Uri uri)  {
+		String selection = null;
+		String[] selectionArgs = null;
+		// Uri is different in versions after KITKAT (Android 4.4), we need to
+		if (Build.VERSION.SDK_INT >= 19 && DocumentsContract.isDocumentUri(context.getApplicationContext(), uri)) {
+			if (isExternalStorageDocument(uri)) {
+				final String docId = DocumentsContract.getDocumentId(uri);
+				final String[] split = docId.split(":");
+				return Environment.getExternalStorageDirectory() + "/" + split[1];
+			} else if (isDownloadsDocument(uri)) {
+				final String id = DocumentsContract.getDocumentId(uri);
+				uri = ContentUris.withAppendedId(
+						Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+			}
+		}
+		if ("content".equalsIgnoreCase(uri.getScheme())) {
+			String[] projection = {
+					MediaStore.Images.Media.DATA
+			};
+			Cursor cursor;
+			try {
+				cursor = context.getContentResolver()
+						.query(uri, projection, null, null, null);
+				int column_index = cursor != null ? cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA) : 0;
+				assert cursor != null;
+				if (cursor.moveToFirst()) {
+					return cursor.getString(column_index);
+				}
+				cursor.close();
+			} catch (Exception ignored) {
+			}
+		} else if ("file".equalsIgnoreCase(uri.getScheme())) {
+			return uri.getPath();
+		}
+		return null;
+	}
+
+	private static boolean isExternalStorageDocument(Uri uri) {
+		return "com.android.externalstorage.documents".equals(uri.getAuthority());
+	}
+
+	private static boolean isDownloadsDocument(Uri uri) {
+		return "com.android.providers.downloads.documents".equals(uri.getAuthority());
 	}
 
 	public void requestPassword(final Bundle savedInstanceState) {

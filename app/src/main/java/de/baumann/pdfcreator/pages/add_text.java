@@ -607,6 +607,15 @@ public class add_text extends Fragment {
         helper_pdf.toolbar(getActivity());
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser && isResumed()) {
+            helper_pdf.toolbar(getActivity());
+            helper_pdf.pdf_textField(getActivity(), rootView);
+        }
+    }
+
     private void createPDF() {
         // Output file
         String outputPath = Environment.getExternalStorageDirectory() +  "/" + "123456.pdf";

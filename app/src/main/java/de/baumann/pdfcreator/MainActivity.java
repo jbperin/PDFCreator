@@ -70,8 +70,6 @@ public class MainActivity extends AppCompatActivity {
                     sharedPref.edit().putInt("startFragment", 0).apply();
                 } if (type.startsWith("text/")) {
                     sharedPref.edit().putInt("startFragment", 1).apply();
-                } else if (type.startsWith("application/pdf")) {
-                    sharedPref.edit().putInt("startFragment", 3).apply();
                 }
             }
         }
